@@ -6,6 +6,7 @@ jade = require 'gulp-jade'
 gulp.task 'connect', ->
   connect.server
     root: 'tmp'
+    livereload: true
 
 gulp.task 'default', ['connect', 'coffee', 'jade', 'libs', 'watch']
 
@@ -13,6 +14,7 @@ gulp.task 'coffee', ->
   gulp.src 'app/*.coffee'
     .pipe coffee()
     .pipe gulp.dest 'tmp/js'
+    .pipe connect.reload()
 
 gulp.task 'jade', ->
   gulp.src '*.jade'
