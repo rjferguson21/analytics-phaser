@@ -1,4 +1,4 @@
-User = (id, game, platforms, cursors, user_group) ->
+User = (id, game, platforms, cursors, user_group, score) ->
   x = game.world.randomX
   y = game.world.randomY
 
@@ -8,7 +8,7 @@ User = (id, game, platforms, cursors, user_group) ->
   # this.player = game.add.sprite(x, 20, 'dude')
   this.player = user_group.create(0, 20, 'dude')
   this.id = id
-  this.score = 0
+  this.score = score
   this.last_updated = new Date()
 
   #  We need to enable physics on the player
@@ -22,7 +22,8 @@ User = (id, game, platforms, cursors, user_group) ->
 
   this.player.body.velocity.x = this.game.rnd.integerInRange(-200, 200)
   this.player.body.velocity.y = this.game.rnd.integerInRange(-200, 200)
-  this.player.body.angularVelocity = this.game.rnd.integerInRange(-200, 200)
+
+  # this.player.body.angularVelocity = this.game.rnd.integerInRange(-200, 200)
   #  Our two animations, walking left and right.
   this.player.animations.add "left", [
     0
@@ -36,6 +37,8 @@ User = (id, game, platforms, cursors, user_group) ->
     7
     8
   ], 10, true
+
+
 
   style =
     font: "10px Arial"
@@ -51,7 +54,7 @@ User::load_texture = (asset) ->
 
 User::receive_update = (event) ->
   # update user
-  this.add_score(event.points)
+  this.add_score(event.score)
   this.last_updated = new Date()
 
 User::add_score = (score) ->
@@ -66,14 +69,14 @@ User::update = ->
   this.score_text.position.x = this.player.body.position.x
   this.score_text.position.y = this.player.body.position.y
 
-  if this.last_updated  < Date.now() - (5 * 1000)
+  if this.last_updated  < Date.now() - (60 * 1000)
     this.player.tint = 0x000000
   else
     this.player.tint = 0xFF0000
 
-  if this.player.body._dx > 0.9
+  if this.player.body.velocity.x > 0
     this.player.animations.play 'right'
-  else if this.player.body._dx < -0.9
+  else if this.player.body.velocity.x < 0
     this.player.animations.play 'left'
   else
     this.player.frame = 4

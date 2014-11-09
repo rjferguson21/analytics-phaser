@@ -12,6 +12,8 @@ preload = ->
   game.load.image "star", "assets/star.png"
   game.load.spritesheet "baddie", "assets/baddie.png", 32, 32
   game.load.spritesheet "dude", "assets/dude.png", 32, 48
+  game.load.spritesheet "blue_fish", "assets/blue_fish.png", 21, 21
+
   return
 create = ->
 
@@ -47,23 +49,24 @@ create = ->
   #  Our controls.
   cursors = game.input.keyboard.createCursorKeys()
 
-  # i = 0
-  # while i < 40
-  #   users.push new User(game, platforms, cursors, user_group)
-  #   i++
-  i = 0
-  setInterval ->
-    users[i] = new User(i++, game, platforms, cursors, user_group)
-  , 5000
+  socket = io 'http://api.nxt-games.nxtgd.net:80'
+
+  socket.on 'update', (data) ->
+    console.log 'update', data
+    if users[data.id]?
+      users[data.id].receive_update(data)
+    else
+      users[data.id] = new User(data.id, game, platforms, cursors, user_group)
+
+
+  socket.on 'users', (users_list) ->
+    console.log 'users', users_list
+    for user in users_list
+      users[user.id] = new User(user.id, game, platforms, cursors, user_group)
+
   return
 
 update = ->
-
-  for item in window.update_queue
-    users[item.id].receive_update(item.event)
-
-  window.update_queue = []
-
   for key,value of users
     #  Collide the player and the stars with the platforms
     value.update()
