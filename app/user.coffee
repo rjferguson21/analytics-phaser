@@ -6,7 +6,8 @@ User = (config, game, platforms, cursors, user_group) ->
   this.platforms = platforms
   this.cursors = cursors
   # this.player = game.add.sprite(x, 20, 'dude')
-  this.player = user_group.create(0, 20, 'dude')
+  this.player = user_group.create(x, y, 'seacreatures', 'octopus0000')
+  this.player.anchor.setTo(0.2, 0.2)
   this.id = config.id
   this.score = config.score
   this.last_updated = new Date(config.last_action.timestamp)
@@ -17,36 +18,35 @@ User = (config, game, platforms, cursors, user_group) ->
   #  Player physics properties. Give the little guy a slight bounce.
   this.player.body.bounce.y = .8
   this.player.body.bounce.x = .8
-  this.player.body.gravity.y = 300
+  # this.player.body.gravity.y = 300
   this.player.body.collideWorldBounds = true
 
   this.player.body.velocity.x = this.game.rnd.integerInRange(-200, 200)
   this.player.body.velocity.y = this.game.rnd.integerInRange(-200, 200)
 
-  this.player.body.angularVelocity = this.game.rnd.integerInRange(-200, 200)
+  # this.player.body.angularVelocity = this.game.rnd.integerInRange(-200, 200)
 
-  #  Our two animations, walking left and right.
-  this.player.animations.add "left", [
-    0
-    1
-    2
-    3
-  ], 10, true
-  this.player.animations.add "right", [
-    5
-    6
-    7
-    8
-  ], 10, true
+  frameNames = Phaser.Animation.generateFrameNames('octopus', 0, 24, '', 4);
 
+  this.player.animations.add 'swimocto', frameNames, 30, true, false
+  this.player.animations.play 'swimocto'
 
+  frameNames = Phaser.Animation.generateFrameNames('blueJellyfish', 0, 32, '', 4);
 
-  style =
-    font: "10px Arial"
-    fill: "#ff0044"
+  this.player.animations.add 'swimjelly', frameNames, 30, true, false
+  this.player.animations.play 'swimjelly'
+
+  frameNames = Phaser.Animation.generateFrameNames('crab1', 0, 32, '', 4);
+
+  this.player.animations.add 'crab1', frameNames, 30, true, false
+  this.player.animations.play 'crab1'
+
+  this.style =
+    font: "12px Arial"
+    fill: "#000000"
     align: "center"
 
-  this.score_text = this.game.add.text(this.player.body.position.x, this.player.body.position.y, this.score, style)
+  this.score_text = this.game.add.text(this.player.body.position.x, this.player.body.position.y, this.score, this.style)
 
   return this
 
@@ -65,24 +65,39 @@ User::update_score = (score) ->
 User::update = ->
   this.game.physics.arcade.collide this.player, this.platforms
 
-  this.score_text.position.x = this.player.body.position.x
-  this.score_text.position.y = this.player.body.position.y
+  this.score_text.position.x = this.player.body.position.x + 30
+  this.score_text.position.y = this.player.body.position.y + 30
 
-  if this.score > 20
-    this.load_texture 'baddie'
+  if this.score > 100
+    # this.player.tint = 0xFF0000
+    this.player.animations.play 'swimocto'
 
-  if this.last_updated  < Date.now() - (60 * 1000)
-    this.player.tint = 0x000000
+  else if this.score > 200
+    # this.player.tint = 0xFF0000
+    this.player.animations.play 'crab1'
 
-  if this.last_updated  < Date.now() - (120 * 1000)
+  else
+    this.player.animations.play 'swimjelly'
+
+
+  if this.last_updated  < Date.now() - (10 * 1000)
+    this.player.alpha = .2
+  else
+    this.player.alpha = 1
+
+  if this.last_updated  < Date.now() - (20 * 1000)
     this.player.kill()
     this.score_text.destroy()
+  else if not this.player.alive
+    this.player.revive()
+    this.score_text = this.game.add.text(this.player.body.position.x, this.player.body.position.y, this.score, this.style)
 
-  if this.player.body.velocity.x > 0
-    this.player.animations.play 'right'
-  else if this.player.body.velocity.x < 0
-    this.player.animations.play 'left'
-  else
-    this.player.frame = 4
+
+  # if this.player.body.velocity.x > 0
+  #   this.player.animations.play 'right'
+  # else if this.player.body.velocity.x < 0
+  #   this.player.animations.play 'left'
+  # else
+  #   this.player.frame = 4
 
 window.User = User

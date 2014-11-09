@@ -13,6 +13,10 @@ preload = ->
   game.load.spritesheet "baddie", "assets/baddie.png", 32, 32
   game.load.spritesheet "dude", "assets/dude.png", 32, 48
   game.load.spritesheet "blue_fish", "assets/blue_fish.png", 21, 21
+  game.load.spritesheet "fish", "assets/fish.png", 64, 64
+  game.load.spritesheet "jellyfish", "assets/jellyfish.png", 30, 64
+
+  game.load.atlas('seacreatures', 'assets/seacreatures_json.png', 'assets/seacreatures_json.json')
 
   return
 create = ->
