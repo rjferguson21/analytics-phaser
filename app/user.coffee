@@ -68,10 +68,9 @@ User::update = ->
   this.score_text.position.x = this.player.body.position.x + 30
   this.score_text.position.y = this.player.body.position.y + 30
 
-  if this.score > 100
+  if this.score > 100 && this.score < 200
     # this.player.tint = 0xFF0000
     this.player.animations.play 'swimocto'
-
   else if this.score > 200
     # this.player.tint = 0xFF0000
     this.player.animations.play 'crab1'
