@@ -1,4 +1,4 @@
-User = (id, game, platforms, cursors, user_group, score) ->
+User = (config, game, platforms, cursors, user_group) ->
   x = game.world.randomX
   y = game.world.randomY
 
@@ -7,9 +7,9 @@ User = (id, game, platforms, cursors, user_group, score) ->
   this.cursors = cursors
   # this.player = game.add.sprite(x, 20, 'dude')
   this.player = user_group.create(0, 20, 'dude')
-  this.id = id
-  this.score = score
-  this.last_updated = new Date()
+  this.id = config.id
+  this.score = config.score
+  this.last_updated = new Date(config.last_action.timestamp)
 
   #  We need to enable physics on the player
   game.physics.arcade.enable this.player
@@ -23,7 +23,8 @@ User = (id, game, platforms, cursors, user_group, score) ->
   this.player.body.velocity.x = this.game.rnd.integerInRange(-200, 200)
   this.player.body.velocity.y = this.game.rnd.integerInRange(-200, 200)
 
-  # this.player.body.angularVelocity = this.game.rnd.integerInRange(-200, 200)
+  this.player.body.angularVelocity = this.game.rnd.integerInRange(-200, 200)
+
   #  Our two animations, walking left and right.
   this.player.animations.add "left", [
     0
@@ -45,7 +46,7 @@ User = (id, game, platforms, cursors, user_group, score) ->
     fill: "#ff0044"
     align: "center"
 
-  this.score_text = this.game.add.text(this.player.body.position.x, this.player.body.position.y, '', style)
+  this.score_text = this.game.add.text(this.player.body.position.x, this.player.body.position.y, this.score, style)
 
   return this
 
@@ -54,14 +55,12 @@ User::load_texture = (asset) ->
 
 User::receive_update = (event) ->
   # update user
-  this.add_score(event.score)
-  this.last_updated = new Date()
+  this.update_score event.score
+  this.last_updated = new Date(event.last_action.timestamp)
 
-User::add_score = (score) ->
-  this.score += score
-  this.score_text.text = this.score
-  if this.score > 20
-    this.load_texture 'baddie'
+User::update_score = (score) ->
+  this.score = score
+  this.score_text.text = score
 
 User::update = ->
   this.game.physics.arcade.collide this.player, this.platforms
@@ -69,10 +68,15 @@ User::update = ->
   this.score_text.position.x = this.player.body.position.x
   this.score_text.position.y = this.player.body.position.y
 
+  if this.score > 20
+    this.load_texture 'baddie'
+
   if this.last_updated  < Date.now() - (60 * 1000)
     this.player.tint = 0x000000
-  else
-    this.player.tint = 0xFF0000
+
+  if this.last_updated  < Date.now() - (120 * 1000)
+    this.player.kill()
+    this.score_text.destroy()
 
   if this.player.body.velocity.x > 0
     this.player.animations.play 'right'

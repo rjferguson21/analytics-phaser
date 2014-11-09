@@ -56,13 +56,13 @@ create = ->
     if users[data.id]?
       users[data.id].receive_update(data)
     else
-      users[data.id] = new User(data.id, game, platforms, cursors, user_group)
+      users[data.id] = new User(data, game, platforms, cursors, user_group)
 
 
   socket.on 'users', (users_list) ->
     console.log 'users', users_list
     for user in users_list
-      users[user.id] = new User(user.id, game, platforms, cursors, user_group)
+      users[user.id] = new User(user, game, platforms, cursors, user_group)
 
   return
 
