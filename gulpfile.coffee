@@ -5,10 +5,10 @@ jade = require 'gulp-jade'
 s3 = require 'gulp-s3'
 fs = require 'fs'
 
-aws = JSON.parse(fs.readFileSync('/home/rob/.awscred'))
+aws = JSON.parse(fs.readFileSync('/home/rob/.nxtawscred'))
 aws.key = aws.accessKeyId
 aws.secret = aws.secretAccessKey
-aws.bucket = 'ferguso.com'
+aws.bucket = 'fishtank.nxtgd.net'
 aws.region = 'us-east-1'
 
 
@@ -41,5 +41,9 @@ gulp.task 'watch', ->
   gulp.watch 'app/*.coffee', ['coffee']
 
 gulp.task 'deploy', ->
-  gulp.src('./tmp/**')
-    .pipe(s3(aws));
+  options =
+    headers:
+        'Cache-Control': 'private, max-age=600'
+
+  gulp.src(['./tmp/**', '.htpasswd'])
+    .pipe(s3(aws, options));
