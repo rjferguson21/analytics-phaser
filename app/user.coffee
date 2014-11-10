@@ -41,6 +41,11 @@ User = (config, game, platforms, cursors, user_group) ->
   this.player.animations.add 'crab1', frameNames, 30, true, false
   this.player.animations.play 'crab1'
 
+  frameNames = Phaser.Animation.generateFrameNames('purpleFish', 0, 20, '', 4);
+
+  this.player.animations.add 'pfish', frameNames, 30, true, false
+  this.player.animations.play 'pfish'
+
   this.style =
     font: "12px Arial"
     fill: "#000000"
@@ -68,7 +73,9 @@ User::update = ->
   this.score_text.position.x = this.player.body.position.x + 30
   this.score_text.position.y = this.player.body.position.y + 30
 
-  if this.score > 100 && this.score < 200
+  if this.score > 50 && this.score < 100
+    this.player.animations.play 'pfish'
+  else if this.score > 100 && this.score < 200
     # this.player.tint = 0xFF0000
     this.player.animations.play 'swimocto'
   else if this.score > 200
@@ -79,12 +86,12 @@ User::update = ->
     this.player.animations.play 'swimjelly'
 
 
-  if this.last_updated  < Date.now() - (10 * 1000)
+  if this.last_updated  < Date.now() - (300 * 1000)
     this.player.alpha = .2
   else
     this.player.alpha = 1
 
-  if this.last_updated  < Date.now() - (20 * 1000)
+  if this.last_updated  < Date.now() - (500 * 1000)
     this.player.kill()
     this.score_text.destroy()
   else if not this.player.alive

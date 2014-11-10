@@ -2,6 +2,15 @@ gulp = require 'gulp'
 connect = require 'gulp-connect'
 coffee = require 'gulp-coffee'
 jade = require 'gulp-jade'
+s3 = require 'gulp-s3'
+fs = require 'fs'
+
+aws = JSON.parse(fs.readFileSync('/home/rob/.awscred'))
+aws.key = aws.accessKeyId
+aws.secret = aws.secretAccessKey
+aws.bucket = 'ferguso.com'
+aws.region = 'us-east-1'
+
 
 gulp.task 'connect', ->
   connect.server
@@ -30,3 +39,7 @@ gulp.task 'libs', ->
 
 gulp.task 'watch', ->
   gulp.watch 'app/*.coffee', ['coffee']
+
+gulp.task 'deploy', ->
+  gulp.src('./tmp/**')
+    .pipe(s3(aws));
